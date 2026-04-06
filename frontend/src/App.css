@@ -29,19 +29,22 @@ body {
 .chat-container h1 {
   text-align: left;
   color: #222;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .top-bar {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
 .title {
   flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
 }
 
 .auth-actions {
@@ -193,9 +196,9 @@ body {
 }
 
 .sub {
-  text-align: center;
+  text-align: left;
   color: #666;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .chat-box {

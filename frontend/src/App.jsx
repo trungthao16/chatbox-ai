@@ -185,8 +185,8 @@ export default function App() {
       <div className="chat-container">
         <div className="top-bar">
           <div className="title">
-            <h1>🤖 AI Chatbox </h1>
-            <p className="sub">Chat với AI</p>
+            <h1>🤖 Chatbox AI </h1>
+            <p className="sub"></p>
           </div>
 
           <div className="auth-actions">
