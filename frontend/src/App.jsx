@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const CHAT_API_URL = "http://localhost:5000/api/chat";
-const AUTH_API_URL = "http://localhost:5000/api/auth";
+const CHAT_API_URL = "https://chatbox-ai-backend-quov.onrender.com/api/chat";
+const AUTH_API_URL = "https://chatbox-ai-backend-quov.onrender.com/api/auth";
 
 export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
