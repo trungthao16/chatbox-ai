@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5000;
 // ✅ CORS chuẩn (fix lỗi của bạn)
 const allowedOrigins = [
   "http://localhost:5173",                // chạy local
-  "https://frontend-uhvk.onrender.com"   // frontend deploy
+  "https://chatbox-ai-eight.vercel.app"   // frontend deploy trên Vercel
 ];
 
 app.use(
