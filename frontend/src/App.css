@@ -1,0 +1,280 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f4f7fb;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+
+.chat-container {
+  width: 100%;
+  max-width: 800px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.chat-container h1 {
+  text-align: left;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.title {
+  flex: 1;
+}
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-user {
+  font-size: 14px;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.auth-button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #2563eb;
+  background: #ffffff;
+  color: #2563eb;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.auth-button:hover {
+  background: #eaf2ff;
+}
+
+.auth-button.secondary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.auth-button.secondary:hover {
+  background: #1d4ed8;
+}
+
+.link-button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.link-button:hover {
+  background: #f3f4f6;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
+}
+
+.modal-title {
+  margin-bottom: 12px;
+}
+
+.modal-note {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: -6px;
+  margin-bottom: 14px;
+}
+
+.auth-error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.form-row label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #111827;
+}
+
+.form-row input {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  outline: none;
+}
+
+.form-row input:focus {
+  border-color: #2563eb;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.primary-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.primary-btn:hover {
+  background: #1d4ed8;
+}
+
+.secondary-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  background: #e5e7eb;
+  color: #111827;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.secondary-btn:hover {
+  background: #d1d5db;
+}
+
+.sub {
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.chat-box {
+  height: 450px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fafafa;
+  margin-bottom: 16px;
+}
+
+.message {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.message strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.message.user {
+  background: #dbeafe;
+  text-align: right;
+}
+
+.message.ai {
+  background: #eaf7e9;
+  text-align: left;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  margin-top: 180px;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+}
+
+.input-area button {
+  padding: 14px 22px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.input-area button:hover {
+  background: #1d4ed8;
+}
+
+.input-area button:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .top-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .auth-actions {
+    justify-content: flex-end;
+  }
+}
