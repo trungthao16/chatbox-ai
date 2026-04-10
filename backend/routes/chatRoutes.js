@@ -5,8 +5,11 @@ const protect = require("../middleware/authMiddleware"); // Sửa lại đúng t
 
 const router = express.Router();
 
-// 1. Sửa lỗi: Khởi tạo đúng tên class GoogleGenerativeAI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// 1. Khởi tạo danh sách API Keys từ .env (hỗ trợ xoay tua nhiều key)
+const apiKeys = (process.env.GEMINI_API_KEY || "").split(",").map(k => k.trim()).filter(k => k);
+if (apiKeys.length === 0) {
+    console.error("CRITICAL ERROR: GEMINI_API_KEY is not defined in .env");
+}
 
 // Bảo vệ toàn bộ API chat bằng JWT
 router.use(protect);
@@ -41,38 +44,57 @@ router.post("/", async (req, res) => {
     }
 
     // 2. Danh sách các model ưu tiên (Fallback tự động)
-    // Sẽ chạy thử theo thứ tự: 2.5 -> 2.0 -> 1.5 -> bản latest mỏ neo
     const modelNames = [
       "gemini-2.5-flash", 
       "gemini-2.0-flash", 
       "gemini-1.5-flash", 
       "gemini-flash-latest"
     ];
+
     let reply = "";
-    
-    // 3. Thử lần lượt các model
-    for (const modelName of modelNames) {
-      try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        const chatSession = model.startChat({
-          history: history.map(item => ({
-            role: item.role === "user" ? "user" : "model",
-            parts: [{ text: item.text }],
-          })),
-        });
-        
-        const result = await chatSession.sendMessage(message);
-        reply = result.response.text();
-        // Nếu lấy được kết quả thì thoát vòng lặp ngay
-        break; 
-      } catch (err) {
-        console.warn(`[Cảnh báo] Model ${modelName} gặp lỗi/quá tải, đang thử model tiếp theo...`);
-        // Lỗi thì chạy tiếp sang model kế tiếp
+    let finalError = null;
+
+    // 3. VÒNG LẶP 1: Thử qua từng API Key (Xoay tua Key)
+    for (let i = 0; i < apiKeys.length; i++) {
+      const currentKey = apiKeys[i];
+      const genAI = new GoogleGenerativeAI(currentKey);
+
+      // 4. VÒNG LẶP 2: Thử qua từng Model cho Key hiện tại (Xoay tua Model)
+      for (const modelName of modelNames) {
+        try {
+          const model = genAI.getGenerativeModel({ model: modelName });
+          const chatSession = model.startChat({
+            history: history.map(item => ({
+              role: item.role === "user" ? "user" : "model",
+              parts: [{ text: item.text }],
+            })),
+          });
+
+          const result = await chatSession.sendMessage(message);
+          reply = result.response.text();
+          
+          if (reply) break; // Thành công thì thoát khỏi vòng lặp model
+        } catch (err) {
+          finalError = err;
+          const isRateLimit = err.message.includes("429") || err.message.toLowerCase().includes("quota");
+          
+          if (isRateLimit) {
+            console.warn(`[Key ${i+1}] Hết lượt (429). Đang chuyển sang Key tiếp theo...`);
+            break; // Nếu hết hạn mức của Key này, bỏ qua các model khác và nhảy sang Key mới luôn
+          } else {
+            console.warn(`[Key ${i+1}][Model ${modelName}] Lỗi: ${err.message.split('\n')[0]}. Thử model tiếp theo...`);
+          }
+        }
+      }
+
+      if (reply) {
+        console.log(`=> Thành công với Key số ${i+1}`);
+        break; // Thành công thì thoát khỏi vòng lặp key
       }
     }
 
     if (!reply) {
-      throw new Error("Tất cả hệ thống AI hiện đều đang quá tải, vui lòng thử lại sau vài giây.");
+      throw new Error(finalError ? finalError.message : "Tất cả các API Keys và Models đều đang bận, vui lòng thử lại sau.");
     }
 
     // 5. Lưu vào Database
