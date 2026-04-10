@@ -40,21 +40,35 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // 2. Cấu hình Model - Đổi thành model được hỗ trợ bởi API key của bạn
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    // 2. Danh sách các model ưu tiên (Fallback tự động)
+    // Sẽ chạy thử gemini-2.5-flash trước, nếu mạng quá tải (503) hoặc lỗi 429 thì tự động chuyển sang gemini-flash-latest
+    const modelNames = ["gemini-2.5-flash", "gemini-flash-latest"];
+    let reply = "";
+    
+    // 3. Thử lần lượt các model
+    for (const modelName of modelNames) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const chatSession = model.startChat({
+          history: history.map(item => ({
+            role: item.role === "user" ? "user" : "model",
+            parts: [{ text: item.text }],
+          })),
+        });
+        
+        const result = await chatSession.sendMessage(message);
+        reply = result.response.text();
+        // Nếu lấy được kết quả thì thoát vòng lặp ngay
+        break; 
+      } catch (err) {
+        console.warn(`[Cảnh báo] Model ${modelName} gặp lỗi/quá tải, đang thử model tiếp theo...`);
+        // Lỗi thì chạy tiếp sang model kế tiếp
+      }
+    }
 
-    // 3. Chuyển lịch sử về format chuẩn của Google SDK
-    // Lưu ý: role phải là 'user' và 'model'
-    const chatSession = model.startChat({
-      history: history.map(item => ({
-        role: item.role === "user" ? "user" : "model",
-        parts: [{ text: item.text }],
-      })),
-    });
-
-    // 4. Gửi tin nhắn mới
-    const result = await chatSession.sendMessage(message);
-    const reply = result.response.text();
+    if (!reply) {
+      throw new Error("Tất cả hệ thống AI hiện đều đang quá tải, vui lòng thử lại sau vài giây.");
+    }
 
     // 5. Lưu vào Database
     const savedChat = await Chat.create({
