@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {
     }
 
     // 2. Cấu hình Model - Đổi thành model được hỗ trợ bởi API key của bạn
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     // 3. Chuyển lịch sử về format chuẩn của Google SDK
     // Lưu ý: role phải là 'user' và 'model'
