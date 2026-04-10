@@ -41,12 +41,12 @@ router.post("/", async (req, res) => {
     }
 
     // 2. Danh sách các model ưu tiên (Fallback tự động)
-    // Thêm các models khác làm dự phòng cực mạnh trong trường hợp mạng quá căng thẳng
+    // Sẽ chạy thử theo thứ tự: 2.5 -> 2.0 -> 1.5 -> bản latest mỏ neo
     const modelNames = [
       "gemini-2.5-flash", 
-      "gemini-2.5-flash-lite", 
-      "gemini-flash-latest", 
-      "gemini-flash-lite-latest"
+      "gemini-2.0-flash", 
+      "gemini-1.5-flash", 
+      "gemini-flash-latest"
     ];
     let reply = "";
     
