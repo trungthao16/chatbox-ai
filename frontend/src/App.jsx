@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
 
 const CHAT_API_URL = "https://chatbox-ai-backend-quov.onrender.com/api/chat";
 const AUTH_API_URL = "https://chatbox-ai-backend-quov.onrender.com/api/auth";
@@ -222,7 +223,7 @@ export default function App() {
                 className={`message ${item.role === "user" ? "user" : "ai"}`}
               >
                 <strong>{item.role === "user" ? "Bạn" : "AI"}:</strong>
-                <span>{item.text}</span>
+                <div className="md-content"><ReactMarkdown>{item.text}</ReactMarkdown></div>
               </div>
             ))
           )}

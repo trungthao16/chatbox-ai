@@ -281,3 +281,25 @@ body {
     justify-content: flex-end;
   }
 }
+
+/* Tinh chỉnh riêng cho nội dung Markdown */
+.md-content {
+  line-height: 1.6;
+}
+
+.md-content p {
+  margin: 0 0 10px 0;
+}
+
+.md-content p:last-child {
+  margin-bottom: 0;
+}
+
+.md-content ul, .md-content ol {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+.md-content li {
+  margin-bottom: 4px;
+}
