@@ -41,8 +41,13 @@ router.post("/", async (req, res) => {
     }
 
     // 2. Danh sách các model ưu tiên (Fallback tự động)
-    // Sẽ chạy thử gemini-2.5-flash trước, nếu mạng quá tải (503) hoặc lỗi 429 thì tự động chuyển sang gemini-flash-latest
-    const modelNames = ["gemini-2.5-flash", "gemini-flash-latest"];
+    // Thêm các models khác làm dự phòng cực mạnh trong trường hợp mạng quá căng thẳng
+    const modelNames = [
+      "gemini-2.5-flash", 
+      "gemini-2.5-flash-lite", 
+      "gemini-flash-latest", 
+      "gemini-flash-lite-latest"
+    ];
     let reply = "";
     
     // 3. Thử lần lượt các model
