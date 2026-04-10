@@ -43,7 +43,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // 2. Danh sách các model ưu tiên (Fallback tự động)
+    // 2. Danh sách các model ưu tiên (Bản này sẽ được ưu tiên thử trên mọi key đầu tiên)
     const modelNames = [
       "gemini-2.5-flash", 
       "gemini-2.0-flash", 
@@ -54,14 +54,15 @@ router.post("/", async (req, res) => {
     let reply = "";
     let finalError = null;
 
-    // 3. VÒNG LẶP 1: Thử qua từng API Key (Xoay tua Key)
-    for (let i = 0; i < apiKeys.length; i++) {
-      const currentKey = apiKeys[i];
-      const genAI = new GoogleGenerativeAI(currentKey);
-
-      // 4. VÒNG LẶP 2: Thử qua từng Model cho Key hiện tại (Xoay tua Model)
-      for (const modelName of modelNames) {
+    // 3. VÒNG LẶP NGOÀI: Thử từng Model theo độ ưu tiên
+    for (const modelName of modelNames) {
+      
+      // 4. VÒNG LẶP TRONG: Thử model đó trên TẤT CẢ các API Key hiện có
+      for (let i = 0; i < apiKeys.length; i++) {
+        const currentKey = apiKeys[i];
+        
         try {
+          const genAI = new GoogleGenerativeAI(currentKey);
           const model = genAI.getGenerativeModel({ model: modelName });
           const chatSession = model.startChat({
             history: history.map(item => ({
@@ -73,24 +74,25 @@ router.post("/", async (req, res) => {
           const result = await chatSession.sendMessage(message);
           reply = result.response.text();
           
-          if (reply) break; // Thành công thì thoát khỏi vòng lặp model
+          if (reply) {
+            console.log(`=> Thành công: Model [${modelName}] - Key [${i+1}]`);
+            break; 
+          }
         } catch (err) {
           finalError = err;
           const isRateLimit = err.message.includes("429") || err.message.toLowerCase().includes("quota");
           
           if (isRateLimit) {
-            console.warn(`[Key ${i+1}] Hết lượt (429). Đang chuyển sang Key tiếp theo...`);
-            break; // Nếu hết hạn mức của Key này, bỏ qua các model khác và nhảy sang Key mới luôn
+            console.warn(`[Model ${modelName}] Key ${i+1} hết hạn mức. Thử Key tiếp theo...`);
           } else {
-            console.warn(`[Key ${i+1}][Model ${modelName}] Lỗi: ${err.message.split('\n')[0]}. Thử model tiếp theo...`);
+            console.warn(`[Model ${modelName}] Key ${i+1} lỗi khác: ${err.message.split('\n')[0]}`);
           }
+          // Lỗi thì vòng lặp trong sẽ tự nhảy sang Key tiếp theo
         }
       }
 
-      if (reply) {
-        console.log(`=> Thành công với Key số ${i+1}`);
-        break; // Thành công thì thoát khỏi vòng lặp key
-      }
+      if (reply) break; // Nếu đã có câu trả lời từ bất kỳ Key nào của Model hiện tại, thoát vòng lặp ngoài
+      console.warn(`[!] Model ${modelName} thất bại trên toàn bộ Keys. Chuyển sang Model tiếp theo...`);
     }
 
     if (!reply) {
