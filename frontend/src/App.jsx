@@ -17,6 +17,7 @@ export default function App() {
   const [authPassword, setAuthPassword] = useState("");
   const [authConfirmPassword, setAuthConfirmPassword] = useState("");
   const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
 
   const sendMessage = async () => {
     if (!token) return;
@@ -116,6 +117,7 @@ export default function App() {
   const openAuth = (mode) => {
     setAuthModal(mode);
     setAuthError("");
+    setAuthSuccess("");
     setAuthUsername("");
     setAuthPassword("");
     setAuthConfirmPassword("");
@@ -138,11 +140,12 @@ export default function App() {
         password: authPassword
       })
       .then((res) => {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("auth_user", JSON.stringify(res.data.user));
-        setToken(res.data.token);
-        setAuthUser(res.data.user);
-        setAuthModal(null);
+        setAuthSuccess("Đăng ký thành công! Vui lòng đăng nhập.");
+        setAuthError("");
+        setAuthModal("login");
+        setAuthUsername("");
+        setAuthPassword("");
+        setAuthConfirmPassword("");
       })
       .catch((err) => {
         setAuthError(err?.response?.data?.message || "Đăng ký thất bại");
@@ -262,6 +265,7 @@ export default function App() {
               <h2 className="modal-title">
                 {authModal === "login" ? "Đăng nhập" : "Đăng ký"}
               </h2>
+              {authSuccess && <div className="auth-success">{authSuccess}</div>}
               {authError && <div className="auth-error">{authError}</div>}
 
               <div className="form-row">
