@@ -43,13 +43,16 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // 2. Danh sách các model ưu tiên (Bản này sẽ được ưu tiên thử trên mọi key đầu tiên)
+    // 2. Danh sách các model ưu tiên (gemini-2.0-flash format gọn hơn 2.5)
     const modelNames = [
-      "gemini-2.5-flash", 
       "gemini-2.0-flash", 
+      "gemini-2.5-flash",
       "gemini-1.5-flash", 
       "gemini-flash-latest"
     ];
+
+    // System instruction để Gemini format response gọn gàng
+    const systemInstruction = "Trả lời bằng Markdown chuẩn. Viết các câu liền mạch trong cùng một đoạn văn, không xuống dòng giữa chừng trong một ý. Chỉ dùng xuống dòng kép (dòng trống) khi chuyển sang ý/đoạn mới. Không tách các từ in đậm hoặc in nghiêng ra dòng riêng.";
 
     let reply = "";
     let finalError = null;
@@ -63,7 +66,10 @@ router.post("/", async (req, res) => {
         
         try {
           const genAI = new GoogleGenerativeAI(currentKey);
-          const model = genAI.getGenerativeModel({ model: modelName });
+          const model = genAI.getGenerativeModel({ 
+            model: modelName,
+            systemInstruction: systemInstruction
+          });
           const chatSession = model.startChat({
             history: history.map(item => ({
               role: item.role === "user" ? "user" : "model",
@@ -73,6 +79,11 @@ router.post("/", async (req, res) => {
 
           const result = await chatSession.sendMessage(message);
           reply = result.response.text();
+          
+          // Post-process: dọn dẹp xuống dòng thừa (3+ newlines → 2)
+          if (reply) {
+            reply = reply.replace(/\n{3,}/g, '\n\n');
+          }
           
           if (reply) {
             console.log(`=> Thành công: Model [${modelName}] - Key [${i+1}]`);
